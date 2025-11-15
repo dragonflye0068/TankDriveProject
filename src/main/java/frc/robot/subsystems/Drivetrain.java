@@ -21,6 +21,9 @@ public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
   private static SparkMaxConfig config = new SparkMaxConfig();
 
+  private static final double kCountsPerRevolution = 42.0; //check if really trustworthy
+  private static final double kWheelDiameterCentimetre = 15.0; //very painfully calculated
+
   //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
   final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
@@ -52,6 +55,18 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public double getLeftDistance() {
+    //shoot this will not work lmao
+    return leftEncoder1.getPosition();
+  }
+
+  public void resetEncoders() {
+    leftEncoder1.setPosition(0);
+    leftEncoder2.setPosition(0);
+    rightEncoder1.setPosition(0);
+    rightEncoder2.setPosition(0);
   }
 
   public void runMotor(double leftSpeed, double rightSpeed) {
