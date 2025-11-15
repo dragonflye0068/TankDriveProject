@@ -8,6 +8,7 @@ import frc.robot.subsystems.Drivetrain;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -15,10 +16,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class TeleopCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private Drivetrain m_Drivetrain;
-  PIDController velocityPidController = new PIDController(0.02, 0.001, 0.3);
+  //PIDController velocityPidController = new PIDController(0.02, 0.001, 0.3);
+  PIDController leftVelocityPidController = new PIDController(0.02, 0.001, 0.3);
+  PIDController rightVelocityPidController = new PIDController(0.02, 0.001, 0.3);
 
-  double speed;
-  double rotate;
+  double leftSpeed;
+  double rightSpeed;
+  //double speed;
+  //double rotate;
+
+  double leftKv = 0.0018;
+  double rightKv = 0.0018;
+
+  double acceleration;
+
   //USE 10% SPEED WHILE DRIVING ON TABLE
   //USE 15% SPEED WHILE DRIVING ON GROUND
 
@@ -27,15 +38,27 @@ public class TeleopCommand extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public TeleopCommand(DoubleSupplier speed, DoubleSupplier rotate) {
+  public TeleopCommand(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed /*DoubleSupplier speed, DoubleSupplier rotate*/) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(Drivetrain.getInstance());
     m_Drivetrain = Drivetrain.getInstance();
 
-    this.speed = speed.getAsDouble();
-    this.rotate = rotate.getAsDouble();
+    this.leftSpeed = leftSpeed.getAsDouble();
+    this.rightSpeed = rightSpeed.getAsDouble();
+
+    //this.speed = speed.getAsDouble();
+    //this.rotate = rotate.getAsDouble();
     
-    velocityPidController.setSetpoint(speed.getAsDouble());
+    leftVelocityPidController.setSetpoint(leftSpeed.getAsDouble());
+    rightVelocityPidController.setSetpoint(rightSpeed.getAsDouble());
+  }
+
+  public double setSpeed(double leftSpeed) {
+    leftSpeed = leftSpeed - m_Drivetrain.getLeftEncoderVelocity();
+    acceleration = MathUtil.clamp(leftVelocityPidController.calculate(leftSpeed), -12, 12);
+
+    leftSpeed = leftVelocityPidController.getSetpoint() * leftKv;
+    return leftSpeed;
   }
 
   // Called when the command is initially scheduled.
@@ -45,11 +68,16 @@ public class TeleopCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_Drivetrain.runMotor(leftSpeed, rightSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    if (interrupted) {
+      
+    }
+  }
 
   // Returns true when the command should end.
   @Override

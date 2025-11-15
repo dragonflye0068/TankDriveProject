@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.commands.TeleopCommand;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -39,6 +40,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    //temporary joystick command
+    m_Drivetrain.setDefaultCommand(new TeleopCommand(() -> m_driverController.getLeftY(), () -> m_driverController.getRightY()));
   }
 
   /**

@@ -7,6 +7,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,8 +22,13 @@ public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
   private static SparkMaxConfig config = new SparkMaxConfig();
 
+  //oh no
+  //private final DifferentialDrive differentialDrive = new DifferentialDrive(double leftSpeed, double rightSpeed);
+
   private static final double kCountsPerRevolution = 42.0; //check if really trustworthy
   private static final double kWheelDiameterCentimetre = 15.0; //very painfully calculated
+
+  private static double DistancePerPulse;
 
   //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
@@ -45,6 +51,8 @@ public class Drivetrain extends SubsystemBase {
     config.inverted(true);
     rightMotor1.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     rightMotor2.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    DistancePerPulse = (Math.PI * kWheelDiameterCentimetre) / kCountsPerRevolution;
   }
 
   public static Drivetrain getInstance() {
@@ -57,9 +65,21 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public double getLeftDistance() {
+  public double getLeftDistanceCentimetre() {
     //shoot this will not work lmao
-    return leftEncoder1.getPosition();
+    return leftEncoder1.getPosition() * DistancePerPulse;
+  }
+
+  public double getRightDistanceCentimetre() {
+    return rightEncoder1.getPosition() * DistancePerPulse;
+  }
+
+  public double getLeftEncoderVelocity() {
+    return leftEncoder1.getVelocity();
+  }
+
+  public double getRightEncoderVelocity() {
+    return rightEncoder1.getVelocity();
   }
 
   public void resetEncoders() {
@@ -68,6 +88,12 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder1.setPosition(0);
     rightEncoder2.setPosition(0);
   }
+  
+  /*
+  public void tankDrive(double leftSpeed, double rightSpeed) {
+    differentialDrive.tankDrive();
+  }
+  */
 
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
