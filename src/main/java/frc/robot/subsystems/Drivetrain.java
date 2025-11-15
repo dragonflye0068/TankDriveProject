@@ -49,7 +49,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
-
+    //clamped speed. may be changed
     MathUtil.clamp(leftSpeed, -leftSpeed * 0.1, leftSpeed * 0.1);
     MathUtil.clamp(rightSpeed, -rightSpeed * 0.1, rightSpeed * 0.1);
 
