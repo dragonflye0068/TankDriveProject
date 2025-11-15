@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class TeleopCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Drivetrain m_subsystem;
+  //USE 10% SPEED WHILE DRIVING ON TABLE
+  //USE 15% SPEED WHILE DRIVING ON GROUND
 
   /**
    * Creates a new ExampleCommand.

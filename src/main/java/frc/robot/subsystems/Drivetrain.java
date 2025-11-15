@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -48,6 +49,10 @@ public class Drivetrain extends SubsystemBase {
 
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
+
+    MathUtil.clamp(leftSpeed, -leftSpeed * 0.1, leftSpeed * 0.1);
+    MathUtil.clamp(rightSpeed, -rightSpeed * 0.1, rightSpeed * 0.1);
+
     leftMotor1.setVoltage(leftSpeed);
     leftMotor2.setVoltage(leftSpeed);
 
