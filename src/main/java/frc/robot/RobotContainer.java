@@ -23,7 +23,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
-  private final AutoCommand m_autoCommand = new AutoCommand(m_Drivetrain, 2);
+  private final AutoCommand m_autoCommand = new AutoCommand(m_Drivetrain, 20);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,6 +52,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
+    m_Drivetrain.leftEncoder1.setPosition(0);
+    
     return m_autoCommand;
   }
 }

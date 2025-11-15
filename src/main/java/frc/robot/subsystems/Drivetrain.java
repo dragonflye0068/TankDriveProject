@@ -24,7 +24,8 @@ public class Drivetrain extends SubsystemBase {
 
   //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
-  final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
+  public final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
+  
   //left2 id 4
   final SparkMax leftMotor2 = new SparkMax(4, MotorType.kBrushless);
   final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
@@ -62,8 +63,9 @@ public class Drivetrain extends SubsystemBase {
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
     //clamped speed. may be changed
-    leftSpeed = MathUtil.clamp(leftSpeed, -0.1, 0.1);
-    rightSpeed = MathUtil.clamp(rightSpeed, -0.1, 0.1);
+    System.out.println("running");
+    leftSpeed = MathUtil.clamp(leftSpeed, -0.1, 0.1) * 12;
+    rightSpeed = MathUtil.clamp(rightSpeed, -0.1, 0.1) * 12;
 
     leftMotor1.setVoltage(leftSpeed);
     leftMotor2.setVoltage(leftSpeed);

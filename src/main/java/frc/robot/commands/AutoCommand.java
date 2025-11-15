@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -39,10 +40,14 @@ public class AutoCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double RemainingDistance = distance - m_subsystem.getEncoderDistance();
-    
-    double speed = pidController.calculate(RemainingDistance);
+    double RemainingDistance = distance - Math.abs(m_subsystem.getEncoderDistance());
+  
+    // System.out.println("distance: " + distance);
+    // System.out.println(m_subsystem.getEncoderDistance());
 
+    double speed = pidController.calculate(RemainingDistance);
+    
+    // System.out.println(RemainingDistance);
     m_subsystem.runMotor(speed, speed);
   }
 
@@ -50,11 +55,12 @@ public class AutoCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     m_subsystem.runMotor(0, 0);
+    // System.out.println("end");
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return distance - m_subsystem.getEncoderDistance() < 0.5;
+    return distance - Math.abs(m_subsystem.getEncoderDistance()) < 0.5;
   }
 }
