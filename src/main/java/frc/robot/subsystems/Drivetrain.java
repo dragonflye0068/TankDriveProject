@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkMax;
@@ -12,10 +13,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Drivetrain extends SubsystemBase {
-  private static Drivetrain instance;
 
+  private static Drivetrain instance;
   private static SparkMaxConfig config = new SparkMaxConfig();
 
+  //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
   //left2 id 4
   final SparkMax leftMotor2 = new SparkMax(4, MotorType.kBrushless);
@@ -33,6 +35,7 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     rightMotor2.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
+
   public Drivetrain getInstance() {
     if (instance == null) instance = new Drivetrain();
     return instance;
@@ -41,6 +44,15 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void runMotor(double leftSpeed, double rightSpeed) {
+    //0 to 12
+    leftMotor1.setVoltage(leftSpeed);
+    leftMotor2.setVoltage(leftSpeed);
+
+    rightMotor1.setVoltage(rightSpeed);
+    rightMotor2.setVoltage(rightSpeed);
   }
 
   @Override
