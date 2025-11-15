@@ -35,6 +35,10 @@ public class Drivetrain extends SubsystemBase {
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
 
+  public double getEncoderDistance() {
+    return leftEncoder1.getPosition();
+  }
+
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
     config.inverted(false);
@@ -67,6 +71,8 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.setVoltage(rightSpeed);
     rightMotor2.setVoltage(rightSpeed);
   }
+
+  
 
   @Override
   public void simulationPeriodic() {

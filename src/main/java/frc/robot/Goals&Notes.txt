@@ -1,0 +1,17 @@
+goals
+
+
+Teleop
+make robot respond to joystick commands
+allow forward and rotate possibly by using class differentialdrive
+Add acceleration
+Add deceleration
+
+automous
+move forward a specific distance
+Rotate by a specific degree
+
+LOG USING SMARTDASHBOARD
+
+Notes
+Wheel is 15 cm
