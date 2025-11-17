@@ -29,7 +29,8 @@ public class Drivetrain extends SubsystemBase {
 
   //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
-  final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
+  public final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
+  
   //left2 id 4
   final SparkMax leftMotor2 = new SparkMax(4, MotorType.kBrushless);
   final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
@@ -39,6 +40,10 @@ public class Drivetrain extends SubsystemBase {
   //right2 id 3
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
+
+  public double getEncoderDistance() {
+    return leftEncoder1.getPosition();
+  }
 
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
@@ -90,6 +95,8 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.setVoltage(rightSpeed);
     rightMotor2.setVoltage(rightSpeed);
   }
+
+  
 
   @Override
   public void simulationPeriodic() {

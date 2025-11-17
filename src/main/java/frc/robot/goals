@@ -1,7 +1,0 @@
-goals
-
-make robot respond to joystick commands
-allow forward and rotate possibly by using class differentialdrive
-
-automous move forward and rotate by 90 degrees
-LOG USING SMARTDASHBOARD
