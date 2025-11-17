@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.commands.TeleopCommand;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,6 +28,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    m_Drivetrain.setDefaultCommand(new TeleopCommand(() -> m_driverController.getLeftY() - m_driverController.getRightX(), () -> m_driverController.getLeftY() - m_driverController.getRightX()));
   }
 
   /**

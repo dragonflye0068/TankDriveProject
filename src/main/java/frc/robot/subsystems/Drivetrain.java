@@ -7,8 +7,11 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.function.DoubleConsumer;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
@@ -59,7 +62,11 @@ public class Drivetrain extends SubsystemBase {
 
   public double getLeftDistance() {
     //shoot this will not work lmao
-    return leftEncoder1.getPosition();
+    return leftEncoder1.getPosition() * ((Math.PI * kWheelDiameterCentimetre) / kCountsPerRevolution);
+  }
+
+  public double getRightDistance() {
+    return rightEncoder1.getPosition() * ((Math.PI * kWheelDiameterCentimetre) / kCountsPerRevolution);
   }
 
   public void resetEncoders() {
@@ -72,8 +79,10 @@ public class Drivetrain extends SubsystemBase {
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
     //clamped speed. may be changed
-    leftSpeed = MathUtil.clamp(leftSpeed, -0.1, 0.1);
-    rightSpeed = MathUtil.clamp(rightSpeed, -0.1, 0.1);
+
+    //limit speed to 12 * 0.1 (10% of 12)
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
 
     leftMotor1.setVoltage(leftSpeed);
     leftMotor2.setVoltage(leftSpeed);
