@@ -19,18 +19,17 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain m_Drivetrain = Drivetrain.getInstance();
+  private final Drivetrain m_Drivetrain = new Drivetrain();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
-  private final AutoCommand m_autoCommand = new AutoCommand(m_Drivetrain, 20);
+  private final AutoCommand m_autoCommand = new AutoCommand(20);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    m_Drivetrain.setDefaultCommand(new TeleopCommand(() -> m_driverController.getLeftY() - m_driverController.getRightX(), () -> m_driverController.getLeftY() - m_driverController.getRightX()));
   }
 
   /**
@@ -43,6 +42,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    
+    m_Drivetrain.setDefaultCommand(new TeleopCommand(() -> m_driverController.getLeftY() - m_driverController.getRightX(), () -> m_driverController.getLeftY() - m_driverController.getRightX()));
+    System.out.println(m_driverController.getLeftY());
+    
   }
 
   
@@ -54,7 +57,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    m_Drivetrain.leftEncoder1.setPosition(0);
+    m_Drivetrain.resetEncoders();
     
     return m_autoCommand;
   }

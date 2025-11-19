@@ -7,7 +7,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
-//import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 //import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -22,24 +23,38 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class Drivetrain extends SubsystemBase {
 
   private static Drivetrain instance;
-  private static SparkMaxConfig config = new SparkMaxConfig();
+  private static SparkMaxConfig configLeft = new SparkMaxConfig();
+  private static SparkMaxConfig configRight = new SparkMaxConfig();
 
   private static final double kCountsPerRevolution = 42.0; //check if really trustworthy
   private static final double kWheelDiameterCentimetre = 15.0; //very painfully calculated
 
-  //left1 id 1
+  double leftKv = 0.0018793;
+  double rightKv = 0.0018896;
+
+  //DifferentialDrive method, extreme pain!
+  //create two PID controllers: one for left and one for right
+
+  //First motor, Left 1, kBrushless ID 1, SparkMax
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
   public final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
   
-  //left2 id 4
+  //Second motor, Left 2, kBrushless ID 4, SparkMax
   final SparkMax leftMotor2 = new SparkMax(4, MotorType.kBrushless);
   final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
-  //right1 id 2
+  
+  //Third motor, Right 1, kBrushless ID 2, SparkMax
   final SparkMax rightMotor1 = new SparkMax(2, MotorType.kBrushless);
   final RelativeEncoder rightEncoder1 = rightMotor1.getEncoder();
-  //right2 id 3
+  
+  //Fourth motor, Right 2, kBrushless ID 3, SparkMax
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
+
+  DifferentialDrive m_DifferentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
+
+  PIDController leftVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
+  PIDController rightVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -47,16 +62,25 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
-    config.inverted(false);
-    leftMotor1.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    leftMotor2.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    config.inverted(true);
-    rightMotor1.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    rightMotor2.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    configLeft.inverted(false);
+    
+    leftMotor1.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    configLeft.follow(leftMotor1);
+    leftMotor2.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    configRight.inverted(true);
+    
+    rightMotor1.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    configRight.follow(rightMotor1);
+    rightMotor2.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    //ALL MOTORS FOLLOW MOTOR1
+    //ALL ROADS LEAD TO ROME
   }
 
   public static Drivetrain getInstance() {
-    if (instance == null) instance = new Drivetrain();
+    if (instance == null) {
+      instance = new Drivetrain();
+    }
     return instance;
   }
 
@@ -81,6 +105,10 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder2.setPosition(0);
   }
 
+  //updatePIDs method
+
+  //arcadeDrive method
+
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
     //clamped speed. may be changed
@@ -95,8 +123,6 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.setVoltage(rightSpeed);
     rightMotor2.setVoltage(rightSpeed);
   }
-
-  
 
   @Override
   public void simulationPeriodic() {

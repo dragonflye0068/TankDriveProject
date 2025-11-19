@@ -26,11 +26,11 @@ public class AutoCommand extends Command {
 
   private double distance;
 
-  public AutoCommand(Drivetrain subsystem, double moveDistance) {
-    m_subsystem = subsystem;
-    distance = moveDistance;
+  public AutoCommand(double moveDistance) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(Drivetrain.getInstance());
+    m_subsystem = Drivetrain.getInstance();
+    distance = moveDistance;
   }
 
   // Called when the command is initially scheduled.

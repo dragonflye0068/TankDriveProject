@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.TeleopCommand;
+import frc.robot.subsystems.Drivetrain;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -17,6 +20,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private Drivetrain m_Drivetrain = Drivetrain.getInstance();
+  private CommandXboxController m_driverController = new CommandXboxController(0);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -54,6 +59,11 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+
+    //if (isTeleop()) {
+    //  m_autonomousCommand.schedule();
+    //}
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     
 
@@ -80,7 +90,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    //m_Drivetrain.runMotor(-m_driverController.getLeftY() + m_driverController.getRightX(), -m_driverController.getLeftY() - m_driverController.getRightX());
+    //System.out.println(m_driverController.getLeftY());
+  }
 
   @Override
   public void testInit() {
