@@ -83,9 +83,11 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    System.out.println(isAutonomous());
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    System.out.println(isAutonomous());
   }
 
   /** This function is called periodically during operator control. */
