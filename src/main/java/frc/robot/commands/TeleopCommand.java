@@ -20,8 +20,8 @@ public class TeleopCommand extends Command {
   //double leftSpeed;
   //double rightSpeed;
 
-  double speed;
-  double rotate;
+  DoubleSupplier speed;
+  DoubleSupplier rotate;
   //USE 10% SPEED WHILE DRIVING ON TABLE
   //USE 15% SPEED WHILE DRIVING ON GROUND
 
@@ -36,8 +36,8 @@ public class TeleopCommand extends Command {
     addRequirements(Drivetrain.getInstance());
     m_Drivetrain = Drivetrain.getInstance();
 
-    this.speed = speed.getAsDouble();
-    this.rotate = rotate.getAsDouble();
+    this.speed = speed;
+    this.rotate = rotate;
 
     //this.speed = speed.getAsDouble();
     //this.rotate = rotate.getAsDouble();
@@ -54,7 +54,7 @@ public class TeleopCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_Drivetrain.runMotor(speed, rotate);
+    m_Drivetrain.runMotor(speed.getAsDouble(), rotate.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
