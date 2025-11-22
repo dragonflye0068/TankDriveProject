@@ -18,11 +18,11 @@ public class TeleopCommand extends Command {
   PIDController velocityPidController = new PIDController(0.02, 0.001, 0.3);
   
 
-  double leftSpeed;
-  double rightSpeed;
+  //double leftSpeed;
+  //double rightSpeed;
 
-  //double speed;
-  //double rotate;
+  DoubleSupplier speed;
+  DoubleSupplier rotate;
   //USE 10% SPEED WHILE DRIVING ON TABLE
   //USE 15% SPEED WHILE DRIVING ON GROUND
 
@@ -31,7 +31,7 @@ public class TeleopCommand extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public TeleopCommand(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed) {
+  public TeleopCommand(DoubleSupplier speed, DoubleSupplier rotate) {
                     /* DoubleSupplier speed, DoubleSupplier rotate */
     // Use addRequirements() here to declare subsystem dependencies.
     System.out.println("teleop");
@@ -39,8 +39,8 @@ public class TeleopCommand extends Command {
     addRequirements(Drivetrain.getInstance());
     m_Drivetrain = Drivetrain.getInstance();
 
-    this.leftSpeed = leftSpeed.getAsDouble();
-    this.rightSpeed = rightSpeed.getAsDouble();
+    this.speed = speed;
+    this.rotate = rotate;
 
     //this.speed = speed.getAsDouble();
     //this.rotate = rotate.getAsDouble();
@@ -57,7 +57,7 @@ public class TeleopCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_Drivetrain.runMotor(leftSpeed, rightSpeed);
+    m_Drivetrain.runMotor(speed.getAsDouble(), rotate.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

@@ -50,8 +50,10 @@ public class Drivetrain extends SubsystemBase {
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
 
-  PIDController velocityPIDController = new PIDController(0.097, 0, 0);
-  // PIDController rightVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
+  DifferentialDrive m_DifferentialDrive = new DifferentialDrive(leftMotor1::setVoltage, rightMotor1::setVoltage);
+
+  PIDController leftVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
+  PIDController rightVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -106,33 +108,18 @@ public class Drivetrain extends SubsystemBase {
 
   //arcadeDrive method
 
-  public void runMotor(double leftSpeed, double rightSpeed) {
-
-    // just added to make the speed relastic to what the max is
-    leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
-    rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
-
-    rightSpeed = velocityPIDController.calculate(rightSpeed - leftEncoder1.getVelocity());
-    leftSpeed = velocityPIDController.calculate(leftSpeed - rightEncoder2.getVelocity());
+  public void runMotor(double xaxisSpeed, double zaxisRotate) {
+    //0 to 12
+    //clamped speed. may be changed
 
     //limit speed to 12 * 0.1 (10% of 12)
-    // clamp for just in case
-    leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
-    rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
+    //leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
+    //rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
 
-    System.out.println("leftSpeed: "+leftSpeed);
-    // System.out.println("leftEncoder1.getVelocity(): "+leftEncoder1.getVelocity());
-    // System.out.println("leftEncoder2.getVelocity(): "+leftEncoder2.getVelocity());
+    //leftMotor1.setVoltage(leftSpeed);
+    //rightMotor1.setVoltage(rightSpeed);
 
-    leftMotor1.setVoltage(leftSpeed);
-    leftMotor2.setVoltage(leftSpeed);
-
-    // System.out.println("rightSpeed: "+rightSpeed);
-    // System.out.println("rightEncoder2.getVelocity(): "+rightEncoder2.getVelocity());
-    // System.out.println("rightEncoder1.getVelocity(): "+rightEncoder1.getVelocity());
-
-    rightMotor1.setVoltage(rightSpeed);
-    rightMotor2.setVoltage(rightSpeed);
+    m_DifferentialDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
 
   @Override
