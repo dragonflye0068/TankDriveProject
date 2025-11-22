@@ -113,8 +113,13 @@ public class Drivetrain extends SubsystemBase {
     leftVelocityPIDController.setSetpoint(xaxisSpeed - zaxisRotate);
     rightVelocityPIDController.setSetpoint(xaxisSpeed + zaxisRotate);
 
-    double leftSpeed = leftVelocityPIDController.calculate(leftEncoder1.getVelocity());
-    double rightSpeed = rightVelocityPIDController.calculate(rightEncoder1.getVelocity());
+    double leftSpeed = MathUtil.clamp(
+      leftVelocityPIDController.calculate(leftEncoder1.getVelocity()),
+      -12, 12);
+      
+    double rightSpeed = MathUtil.clamp(
+      rightVelocityPIDController.calculate(rightEncoder1.getVelocity()),
+      -12, 12);
 
     leftMotor1.setVoltage(leftSpeed);
     rightMotor1.setVoltage(rightSpeed);
