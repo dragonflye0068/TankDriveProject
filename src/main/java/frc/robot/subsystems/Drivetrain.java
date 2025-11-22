@@ -26,7 +26,7 @@ public class Drivetrain extends SubsystemBase {
   private static SparkMaxConfig configLeft = new SparkMaxConfig();
   private static SparkMaxConfig configRight = new SparkMaxConfig();
 
-  private static final int kCountsPerRevolution = 4096;
+  private static final int kCountsPerRevolution = 42;
   private static final double kWheelDiameterCentimetre = 15.0; //very painfully calculated
 
   // private final PIDController velocityPidController = new PIDController(1, 0, 0);
