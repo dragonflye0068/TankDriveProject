@@ -24,7 +24,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
-  private final AutoCommand m_autoCommand = new AutoCommand(20);
+  private final AutoCommand m_autoCommand = new AutoCommand(200);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -43,8 +43,8 @@ public class RobotContainer {
    */
   private void configureBindings() {
     
-    m_Drivetrain.setDefaultCommand(new TeleopCommand(() -> m_driverController.getLeftY() - m_driverController.getRightX(), () -> m_driverController.getLeftY() - m_driverController.getRightX()));
-    System.out.println(m_driverController.getLeftY());
+    // m_Drivetrain.setDefaultCommand(new TeleopCommand(() -> m_driverController.getLeftY() + m_driverController.getRightX(), () -> m_driverController.getLeftY() - m_driverController.getRightX()));
+    // System.out.println(m_driverController.getLeftY());
     
   }
 

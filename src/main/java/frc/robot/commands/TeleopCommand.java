@@ -16,6 +16,7 @@ public class TeleopCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private Drivetrain m_Drivetrain;
   PIDController velocityPidController = new PIDController(0.02, 0.001, 0.3);
+  
 
   double leftSpeed;
   double rightSpeed;
@@ -33,6 +34,8 @@ public class TeleopCommand extends Command {
   public TeleopCommand(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed) {
                     /* DoubleSupplier speed, DoubleSupplier rotate */
     // Use addRequirements() here to declare subsystem dependencies.
+    System.out.println("teleop");
+
     addRequirements(Drivetrain.getInstance());
     m_Drivetrain = Drivetrain.getInstance();
 

@@ -40,6 +40,8 @@ public class AutoCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // System.out.println("stop just stop");
+
     double RemainingDistance = distance - Math.abs(m_subsystem.getEncoderDistance());
   
     // System.out.println("distance: " + distance);

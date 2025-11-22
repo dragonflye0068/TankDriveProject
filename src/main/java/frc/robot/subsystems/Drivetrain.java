@@ -26,18 +26,17 @@ public class Drivetrain extends SubsystemBase {
   private static SparkMaxConfig configLeft = new SparkMaxConfig();
   private static SparkMaxConfig configRight = new SparkMaxConfig();
 
-  private static final double kCountsPerRevolution = 42.0; //check if really trustworthy
+  private static final int kCountsPerRevolution = 4096;
   private static final double kWheelDiameterCentimetre = 15.0; //very painfully calculated
 
-  double leftKv = 0.0018793;
-  double rightKv = 0.0018896;
+  // private final PIDController velocityPidController = new PIDController(1, 0, 0);
 
   //DifferentialDrive method, extreme pain!
   //create two PID controllers: one for left and one for right
 
   //First motor, Left 1, kBrushless ID 1, SparkMax
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
-  public final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
+  final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
   
   //Second motor, Left 2, kBrushless ID 4, SparkMax
   final SparkMax leftMotor2 = new SparkMax(4, MotorType.kBrushless);
@@ -51,10 +50,8 @@ public class Drivetrain extends SubsystemBase {
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
 
-  DifferentialDrive m_DifferentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
-
-  PIDController leftVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
-  PIDController rightVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
+  PIDController velocityPIDController = new PIDController(0.097, 0, 0);
+  // PIDController rightVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -62,15 +59,15 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
+
     configLeft.inverted(false);
-    
     leftMotor1.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    configLeft.follow(leftMotor1);
+    // configLeft.follow(leftMotor1);
     leftMotor2.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    configRight.inverted(true);
     
+    configRight.inverted(true);
     rightMotor1.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    configRight.follow(rightMotor1);
+    // configRight.follow(rightMotor1); it works maybe but it's not neccesary because we set it later. If you change it can you do it hear and not at home.
     rightMotor2.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     //ALL MOTORS FOLLOW MOTOR1
@@ -110,15 +107,29 @@ public class Drivetrain extends SubsystemBase {
   //arcadeDrive method
 
   public void runMotor(double leftSpeed, double rightSpeed) {
-    //0 to 12
-    //clamped speed. may be changed
 
-    //limit speed to 12 * 0.1 (10% of 12)
+    // just added to make the speed relastic to what the max is
     leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
     rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
 
+    rightSpeed = velocityPIDController.calculate(rightSpeed - leftEncoder1.getVelocity());
+    leftSpeed = velocityPIDController.calculate(leftSpeed - rightEncoder2.getVelocity());
+
+    //limit speed to 12 * 0.1 (10% of 12)
+    // clamp for just in case
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
+
+    System.out.println("leftSpeed: "+leftSpeed);
+    // System.out.println("leftEncoder1.getVelocity(): "+leftEncoder1.getVelocity());
+    // System.out.println("leftEncoder2.getVelocity(): "+leftEncoder2.getVelocity());
+
     leftMotor1.setVoltage(leftSpeed);
     leftMotor2.setVoltage(leftSpeed);
+
+    // System.out.println("rightSpeed: "+rightSpeed);
+    // System.out.println("rightEncoder2.getVelocity(): "+rightEncoder2.getVelocity());
+    // System.out.println("rightEncoder1.getVelocity(): "+rightEncoder1.getVelocity());
 
     rightMotor1.setVoltage(rightSpeed);
     rightMotor2.setVoltage(rightSpeed);

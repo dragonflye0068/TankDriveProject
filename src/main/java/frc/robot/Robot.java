@@ -60,9 +60,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    //if (isTeleop()) {
-    //  m_autonomousCommand.schedule();
-    //}
+    if (isTeleop()) {
+     m_autonomousCommand.schedule();
+    }
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     
@@ -91,8 +91,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //m_Drivetrain.runMotor(-m_driverController.getLeftY() + m_driverController.getRightX(), -m_driverController.getLeftY() - m_driverController.getRightX());
-    //System.out.println(m_driverController.getLeftY());
+    m_Drivetrain.runMotor(m_driverController.getLeftY() + m_driverController.getRightX(), m_driverController.getLeftY() - m_driverController.getRightX());
+    // System.out.println("periodic");
   }
 
   @Override
