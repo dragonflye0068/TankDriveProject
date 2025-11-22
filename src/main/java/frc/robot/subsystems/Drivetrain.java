@@ -52,8 +52,11 @@ public class Drivetrain extends SubsystemBase {
 
   //DifferentialDrive m_DifferentialDrive = new DifferentialDrive(leftMotor1::setVoltage, rightMotor1::setVoltage);
 
-  PIDController leftVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
-  PIDController rightVelocityPIDController = new PIDController(0.1, 0.0032, 0.3);
+  PIDController leftVelocityPIDController = new PIDController(0.00187, 0, 0);
+  PIDController rightVelocityPIDController = new PIDController(0.00187, 0, 0);
+
+  double leftKv = 0.0018659;
+  double rightKv = 0.0018095;
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -65,11 +68,13 @@ public class Drivetrain extends SubsystemBase {
     configLeft.inverted(false);
     leftMotor1.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     configLeft.follow(leftMotor1);
+    //consider leaving leftMotor2 unpowered
     leftMotor2.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
     configRight.inverted(true);
     rightMotor1.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    configRight.follow(rightMotor1); //it works maybe but it's not neccesary because we set it later. If you change it can you do it hear and not at home.
+    configRight.follow(rightMotor1); 
+    //consider leaving rightMotor2 unpowered
     rightMotor2.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     //ALL MOTORS FOLLOW MOTOR1
@@ -110,16 +115,25 @@ public class Drivetrain extends SubsystemBase {
 
   public void runMotor(double xaxisSpeed, double zaxisRotate) {
 
+    double leftError = Math.abs(leftVelocityPIDController.getSetpoint() - leftEncoder1.getVelocity());
+    double rightError = Math.abs(rightVelocityPIDController.getSetpoint() - rightEncoder1.getVelocity());
+
     leftVelocityPIDController.setSetpoint(xaxisSpeed - zaxisRotate);
     rightVelocityPIDController.setSetpoint(xaxisSpeed + zaxisRotate);
 
-    double leftSpeed = MathUtil.clamp(
-      leftVelocityPIDController.calculate(leftEncoder1.getVelocity()),
-      -12, 12);
-      
-    double rightSpeed = MathUtil.clamp(
-      rightVelocityPIDController.calculate(rightEncoder1.getVelocity()),
-      -12, 12);
+    double leftSpeed = leftVelocityPIDController.getSetpoint() * leftKv;
+    double rightSpeed = rightVelocityPIDController.getSetpoint() * rightKv;
+
+    if (leftError < 50) {
+      leftSpeed = MathUtil.clamp(
+        leftVelocityPIDController.calculate(leftEncoder1.getVelocity()),
+        -12, 12);
+    }
+    if (rightError < 50) {
+      rightSpeed = MathUtil.clamp(
+        rightVelocityPIDController.calculate(rightEncoder1.getVelocity()),
+        -12, 12);
+    }
 
     leftMotor1.setVoltage(leftSpeed);
     rightMotor1.setVoltage(rightSpeed);

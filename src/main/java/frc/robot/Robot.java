@@ -93,7 +93,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_Drivetrain.runMotor(m_driverController.getLeftY() + m_driverController.getRightX(), m_driverController.getLeftY() - m_driverController.getRightX());
+    //m_Drivetrain.runMotor(m_driverController.getLeftY() + m_driverController.getRightX(), m_driverController.getLeftY() - m_driverController.getRightX());
     // System.out.println("periodic");
   }
 
