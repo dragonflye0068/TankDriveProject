@@ -55,8 +55,8 @@ public class Drivetrain extends SubsystemBase {
   PIDController leftVelocityPIDController = new PIDController(0.00187, 0, 0);
   PIDController rightVelocityPIDController = new PIDController(0.00187, 0, 0);
 
-  double leftSpeed;
-  double rightSpeed;
+  double leftSpeed = 0;
+  double rightSpeed = 0;
 
   double leftKv = 0.0018659;
   double rightKv = 0.0018095;
