@@ -55,6 +55,9 @@ public class Drivetrain extends SubsystemBase {
   PIDController leftVelocityPIDController = new PIDController(0.00187, 0, 0);
   PIDController rightVelocityPIDController = new PIDController(0.00187, 0, 0);
 
+  double leftSpeed;
+  double rightSpeed;
+
   double leftKv = 0.0018659;
   double rightKv = 0.0018095;
 
@@ -109,31 +112,18 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder2.setPosition(0);
   }
 
-  //updatePIDs method
-
-  //arcadeDrive method
-
   public void runMotor(double xaxisSpeed, double zaxisRotate) {
-
-    double leftError = Math.abs(leftVelocityPIDController.getSetpoint() - leftEncoder1.getVelocity());
-    double rightError = Math.abs(rightVelocityPIDController.getSetpoint() - rightEncoder1.getVelocity());
 
     leftVelocityPIDController.setSetpoint(xaxisSpeed - zaxisRotate);
     rightVelocityPIDController.setSetpoint(xaxisSpeed + zaxisRotate);
+    
+    leftSpeed += MathUtil.clamp(
+      leftVelocityPIDController.calculate(leftEncoder1.getVelocity() * leftKv),
+      -12, 12);
 
-    double leftSpeed = leftVelocityPIDController.getSetpoint() * leftKv;
-    double rightSpeed = rightVelocityPIDController.getSetpoint() * rightKv;
-
-    if (leftError < 50) {
-      leftSpeed = MathUtil.clamp(
-        leftVelocityPIDController.calculate(leftEncoder1.getVelocity()),
-        -12, 12);
-    }
-    if (rightError < 50) {
-      rightSpeed = MathUtil.clamp(
-        rightVelocityPIDController.calculate(rightEncoder1.getVelocity()),
-        -12, 12);
-    }
+    rightSpeed += MathUtil.clamp(
+      rightVelocityPIDController.calculate(rightEncoder1.getVelocity() * rightKv),
+      -12, 12);
 
     leftMotor1.setVoltage(leftSpeed);
     rightMotor1.setVoltage(rightSpeed);
