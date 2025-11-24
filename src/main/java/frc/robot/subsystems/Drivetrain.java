@@ -7,8 +7,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+//import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 //import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -23,43 +22,24 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class Drivetrain extends SubsystemBase {
 
   private static Drivetrain instance;
-  private static SparkMaxConfig configLeft = new SparkMaxConfig();
-  private static SparkMaxConfig configRight = new SparkMaxConfig();
+  private static SparkMaxConfig config = new SparkMaxConfig();
 
-  private static final int kCountsPerRevolution = 42;
+  private static final double kCountsPerRevolution = 42.0; //check if really trustworthy
   private static final double kWheelDiameterCentimetre = 15.0; //very painfully calculated
 
-  // private final PIDController velocityPidController = new PIDController(1, 0, 0);
-
-  //DifferentialDrive method, extreme pain!
-  //create two PID controllers: one for left and one for right
-
-  //First motor, Left 1, kBrushless ID 1, SparkMax
+  //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
-  final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
+  public final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
   
-  //Second motor, Left 2, kBrushless ID 4, SparkMax
+  //left2 id 4
   final SparkMax leftMotor2 = new SparkMax(4, MotorType.kBrushless);
   final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
-  
-  //Third motor, Right 1, kBrushless ID 2, SparkMax
+  //right1 id 2
   final SparkMax rightMotor1 = new SparkMax(2, MotorType.kBrushless);
   final RelativeEncoder rightEncoder1 = rightMotor1.getEncoder();
-  
-  //Fourth motor, Right 2, kBrushless ID 3, SparkMax
+  //right2 id 3
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
-
-  //DifferentialDrive m_DifferentialDrive = new DifferentialDrive(leftMotor1::setVoltage, rightMotor1::setVoltage);
-
-  PIDController leftVelocityPIDController = new PIDController(0.00187, 0, 0);
-  PIDController rightVelocityPIDController = new PIDController(0.00187, 0, 0);
-
-  double leftSpeed = 0;
-  double rightSpeed = 0;
-
-  double leftKv = 0.0018659;
-  double rightKv = 0.0018095;
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -67,27 +47,16 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new ExampleSubsystem. */
   public Drivetrain() {
-
-    configLeft.inverted(false);
-    leftMotor1.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    configLeft.follow(leftMotor1);
-    //consider leaving leftMotor2 unpowered
-    leftMotor2.configure(configLeft, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    
-    configRight.inverted(true);
-    rightMotor1.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    configRight.follow(rightMotor1); 
-    //consider leaving rightMotor2 unpowered
-    rightMotor2.configure(configRight, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    //ALL MOTORS FOLLOW MOTOR1
-    //ALL ROADS LEAD TO ROME
+    config.inverted(false);
+    leftMotor1.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    leftMotor2.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    config.inverted(true);
+    rightMotor1.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rightMotor2.configure(config, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public static Drivetrain getInstance() {
-    if (instance == null) {
-      instance = new Drivetrain();
-    }
+    if (instance == null) instance = new Drivetrain();
     return instance;
   }
 
@@ -112,24 +81,22 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder2.setPosition(0);
   }
 
-  public void runMotor(double xaxisSpeed, double zaxisRotate) {
+  public void runMotor(double leftSpeed, double rightSpeed) {
+    //0 to 12
+    //clamped speed. may be changed
 
-    leftVelocityPIDController.setSetpoint(xaxisSpeed - zaxisRotate);
-    rightVelocityPIDController.setSetpoint(xaxisSpeed + zaxisRotate);
-    
-    leftSpeed += MathUtil.clamp(
-      leftVelocityPIDController.calculate(leftEncoder1.getVelocity() * leftKv),
-      -12, 12);
-
-    rightSpeed += MathUtil.clamp(
-      rightVelocityPIDController.calculate(rightEncoder1.getVelocity() * rightKv),
-      -12, 12);
+    //limit speed to 12 * 0.1 (10% of 12)
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.2, 1.2);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.2, 1.2);
 
     leftMotor1.setVoltage(leftSpeed);
+    leftMotor2.setVoltage(leftSpeed);
+
     rightMotor1.setVoltage(rightSpeed);
-    
-    //m_DifferentialDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+    rightMotor2.setVoltage(rightSpeed);
   }
+
+  
 
   @Override
   public void simulationPeriodic() {

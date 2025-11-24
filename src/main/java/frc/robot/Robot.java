@@ -4,12 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.TeleopCommand;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.commands.JoyStickCommand;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -20,9 +20,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
-  private Drivetrain m_Drivetrain = Drivetrain.getInstance();
-  private CommandXboxController m_driverController = new CommandXboxController(0);
-
+  private final CommandXboxController m_driverController = new CommandXboxController(0);
+  JoyStickCommand moveWithJoystick;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -31,6 +30,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    moveWithJoystick = new JoyStickCommand(m_robotContainer.m_Drivetrain);
   }
 
   /**
@@ -59,11 +59,6 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-
-    if (isTeleop()) {
-     m_autonomousCommand.schedule();
-    }
-
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     
 
@@ -83,18 +78,16 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    System.out.println(isAutonomous());
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    System.out.println(isAutonomous());
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //m_Drivetrain.runMotor(m_driverController.getLeftY() + m_driverController.getRightX(), m_driverController.getLeftY() - m_driverController.getRightX());
-    // System.out.println("periodic");
+    
+    moveWithJoystick.setSpeed(m_driverController.getLeftX(), m_driverController.getLeftY(), m_driverController.getRightX(), m_driverController.getRightY());
   }
 
   @Override

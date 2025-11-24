@@ -5,12 +5,12 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
-//import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+//import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** An example command that uses an example subsystem. */
-public class AutoCommand extends Command {
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+public class JoyStickCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Drivetrain m_subsystem;
   //USE 10% SPEED WHILE DRIVING ON TABLE
@@ -22,15 +22,14 @@ public class AutoCommand extends Command {
    * @param subsystem The subsystem used by this command.
    */
 
-  private final PIDController pidController = new PIDController(1, 0, 0);
-
-  private double distance;
-
-  public AutoCommand(Drivetrain subsystem, double moveDistance) {
+  public JoyStickCommand(Drivetrain subsystem) {
     m_subsystem = subsystem;
-    distance = moveDistance;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
+  }
+
+  public void setSpeed(double lX, double lY, double rX, double rY) {
+    m_subsystem.runMotor(-1*lY+rX, -1*lY-rX);
   }
 
   // Called when the command is initially scheduled.
@@ -39,28 +38,15 @@ public class AutoCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    double RemainingDistance = distance - Math.abs(m_subsystem.getEncoderDistance());
-  
-    // System.out.println("distance: " + distance);
-    // System.out.println(m_subsystem.getEncoderDistance());
-
-    double speed = pidController.calculate(RemainingDistance);
-    
-    // System.out.println(RemainingDistance);
-    m_subsystem.runMotor(speed, speed);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_subsystem.runMotor(0, 0);
-    // System.out.println("end");
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return distance - Math.abs(m_subsystem.getEncoderDistance()) < 0.5;
+    return false;
   }
 }
