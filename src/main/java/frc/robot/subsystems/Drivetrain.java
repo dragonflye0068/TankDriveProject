@@ -8,7 +8,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+//import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -52,14 +53,14 @@ public class Drivetrain extends SubsystemBase {
 
   //DifferentialDrive m_DifferentialDrive = new DifferentialDrive(leftMotor1::setVoltage, rightMotor1::setVoltage);
 
-  PIDController leftVelocityPIDController = new PIDController(0.00187, 0, 0);
-  PIDController rightVelocityPIDController = new PIDController(0.00187, 0, 0);
+  PIDController leftVelocityPIDController = new PIDController(2, 0, 2);
+  PIDController rightVelocityPIDController = new PIDController(2, 0, 2);
 
   double leftSpeed = 0;
   double rightSpeed = 0;
 
   double leftKv = 0.0018659;
-  double rightKv = 0.0018095;
+  double rightKv = 0.0018762;
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -94,6 +95,11 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("TankDriveProject/Drivetrain/leftMotorSpeed", leftEncoder1.getVelocity());
+    SmartDashboard.putNumber("TankDriveProject/Drivetrain/leftMotorTargetSpeed", leftVelocityPIDController.getSetpoint());
+
+    SmartDashboard.putNumber("TankDriveProject/Drivetrain/rightMotorSpeed", rightEncoder1.getVelocity());
+    SmartDashboard.putNumber("TankDriveProject/Drivetrain/rightMotorTargetSpeed", rightVelocityPIDController.getSetpoint());
   }
 
   public double getLeftDistance() {
@@ -117,18 +123,12 @@ public class Drivetrain extends SubsystemBase {
     leftVelocityPIDController.setSetpoint(xaxisSpeed - zaxisRotate);
     rightVelocityPIDController.setSetpoint(xaxisSpeed + zaxisRotate);
     
-    leftSpeed += MathUtil.clamp(
-      leftVelocityPIDController.calculate(leftEncoder1.getVelocity() * leftKv),
-      -12, 12);
+    leftSpeed += leftVelocityPIDController.calculate(leftEncoder1.getVelocity());
 
-    rightSpeed += MathUtil.clamp(
-      rightVelocityPIDController.calculate(rightEncoder1.getVelocity() * rightKv),
-      -12, 12);
+    rightSpeed += rightVelocityPIDController.calculate(rightEncoder1.getVelocity());
 
-    leftMotor1.setVoltage(leftSpeed);
-    rightMotor1.setVoltage(rightSpeed);
-    
-    //m_DifferentialDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+    leftMotor1.setVoltage(MathUtil.clamp(leftSpeed, -12, 12));
+    rightMotor1.setVoltage(MathUtil.clamp(rightSpeed, -12, 12));
   }
 
   @Override

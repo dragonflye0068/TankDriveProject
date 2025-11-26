@@ -87,7 +87,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    System.out.println(isAutonomous());
   }
 
   /** This function is called periodically during operator control. */
