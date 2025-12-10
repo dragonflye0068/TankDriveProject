@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 //import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class JoyStickCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Drivetrain m_subsystem;
+  double grandfathersLeftVoltage = 0;
+  double grandfathersRightVoltage = 0;
+  private final PIDController speedsterPID = new PIDController(0.8,0,0);
   //USE 10% SPEED WHILE DRIVING ON TABLE
   //USE 15% SPEED WHILE DRIVING ON GROUND
 
@@ -29,7 +33,13 @@ public class JoyStickCommand extends Command {
   }
 
   public void setSpeed(double lX, double lY, double rX, double rY) {
-    m_subsystem.runMotor(-1*lY+rX, -1*lY-rX);
+    double targetL = -1*lY-lX;
+    double targetR = -1*lY+lX;
+    double newL = MathUtil.clamp(speedsterPID.calculate(targetL - grandfathersLeftVoltage), -0.55, 0.55);
+    double newR = MathUtil.clamp(speedsterPID.calculate(targetR - grandfathersRightVoltage), -0.55, 0.55);
+    m_subsystem.runMotor(newL, newR);
+    grandfathersLeftVoltage = newL;
+    grandfathersRightVoltage = newR;
   }
 
   // Called when the command is initially scheduled.
