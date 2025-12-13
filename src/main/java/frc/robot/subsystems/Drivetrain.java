@@ -8,8 +8,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.Queue;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
@@ -21,6 +27,15 @@ public class Drivetrain extends SubsystemBase {
 
   private static Drivetrain instance;
   private static SparkMaxConfig config = new SparkMaxConfig();
+
+  private double oldVoltageLeft = 0;
+  private double oldVoltageRight = 0;
+
+  private double leftSpeed;
+  private double rightSpeed;
+
+  private final double kCountsPerRevolution = 42.0; //check if really trustworthy
+  private final double kWheelDiameterCentimetre = 15.0; 
 
   //left1 id 1
   final SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushless);
@@ -36,8 +51,13 @@ public class Drivetrain extends SubsystemBase {
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
 
+  private final PIDController m_accelratiPidController = new PIDController(0.2, 0, 0);
+
+  public final double maxspeed = 0.5;
+
   public double getEncoderDistance() {
-    return leftEncoder1.getPosition();
+
+    return leftEncoder1.getPosition() * ((Math.PI * kWheelDiameterCentimetre) / kCountsPerRevolution);
   }
 
   /** Creates a new ExampleSubsystem. */
@@ -55,26 +75,58 @@ public class Drivetrain extends SubsystemBase {
     return instance;
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void resetEncoders() {
+    leftEncoder1.setPosition(0);
+    leftEncoder2.setPosition(0);
+    rightEncoder1.setPosition(0);
+    rightEncoder2.setPosition(0);
   }
 
   public void runMotor(double leftSpeed, double rightSpeed) {
     //0 to 12
-    //clamped speed. may be changed
-    System.out.println("running");
-    leftSpeed = MathUtil.clamp(leftSpeed, -0.1, 0.1) * 12;
-    rightSpeed = MathUtil.clamp(rightSpeed, -0.1, 0.1) * 12;
+
+    leftSpeed = MathUtil.clamp(leftSpeed, -maxspeed, maxspeed) * 12;
+    rightSpeed = MathUtil.clamp(rightSpeed, -maxspeed, maxspeed) * 12; // remove the * 12 and it won't think in 12 but you must remove the rest
+    // after this point it's thinking in 12  
+
+
+    oldVoltageLeft = leftMotor1.get()*12;
+    oldVoltageRight = rightMotor1.get()*12;
+    System.out.println(oldVoltageLeft);
+
+    double difference = oldVoltageLeft - leftSpeed;
+    
+    oldVoltageLeft += m_accelratiPidController.calculate(difference);
+    difference = oldVoltageRight - rightSpeed;
+    oldVoltageRight += m_accelratiPidController.calculate(difference);
+
+    
+
+    leftSpeed = oldVoltageLeft;
+    rightSpeed = oldVoltageRight;
+    
+    leftSpeed = MathUtil.clamp(leftSpeed, -maxspeed*12, maxspeed*12);
+    rightSpeed = MathUtil.clamp(rightSpeed, -maxspeed*12, maxspeed*12);
 
     leftMotor1.setVoltage(leftSpeed);
     leftMotor2.setVoltage(leftSpeed);
 
     rightMotor1.setVoltage(rightSpeed);
     rightMotor2.setVoltage(rightSpeed);
+
+    this.leftSpeed = leftSpeed;
+    this.rightSpeed = rightSpeed;
+
+    Logger.recordOutput("TankDrive/DrivetrainSubsytem/Speed/Left", leftSpeed);
+    Logger.recordOutput("TankDrive/DrivetrainSubsytem/Speed/Right", rightSpeed);
   }
 
-  
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("left speed", leftSpeed);
+    SmartDashboard.putNumber("right speed", rightSpeed);
+  }
 
   @Override
   public void simulationPeriodic() {
