@@ -5,6 +5,10 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 //import edu.wpi.first.math.MathUtil;
@@ -16,7 +20,10 @@ public class JoyStickCommand extends Command {
   private final Drivetrain m_subsystem;
   double grandfathersLeftVoltage = 0;
   double grandfathersRightVoltage = 0;
-  private final PIDController speedsterPID = new PIDController(0.8,0,0);
+  private final PIDController speedsterPID = new PIDController(.2,0,0);
+  private final LoggedNetworkNumber myConstant = new LoggedNetworkNumber("A constant", 0.0);
+  private double targetL;
+  private double targetR;
   //USE 10% SPEED WHILE DRIVING ON TABLE
   //USE 15% SPEED WHILE DRIVING ON GROUND
 
@@ -33,13 +40,21 @@ public class JoyStickCommand extends Command {
   }
 
   public void setSpeed(double lX, double lY, double rX, double rY) {
-    double targetL = -1*lY-lX;
-    double targetR = -1*lY+lX;
-    double newL = MathUtil.clamp(speedsterPID.calculate(targetL - grandfathersLeftVoltage), -0.55, 0.55);
-    double newR = MathUtil.clamp(speedsterPID.calculate(targetR - grandfathersRightVoltage), -0.55, 0.55);
+    targetL = -1*lY-lX;
+    targetR = -1*lY+lX;
+    if (Math.abs(targetL) < 0.1) {
+      targetL = 0;
+    }
+    if (Math.abs(targetR) < 0.1) {
+      targetR = 0;
+    }
+    Logger.recordOutput("TankDrive/JoyStickCommand/Speed/TargLeft", targetL);
+    Logger.recordOutput("TankDrive/JoyStickCommand/Speed/TargRight", targetR);
+    double newL = MathUtil.clamp(grandfathersLeftVoltage + speedsterPID.calculate(targetL), -0.7, 0.7);
+    double newR = MathUtil.clamp(grandfathersRightVoltage + speedsterPID.calculate(targetR), -0.7, 0.7);
     m_subsystem.runMotor(newL, newR);
-    grandfathersLeftVoltage = newL;
-    grandfathersRightVoltage = newR;
+    grandfathersLeftVoltage = m_subsystem.leftSpee;
+    grandfathersRightVoltage = m_subsystem.rightSpee;
   }
 
   // Called when the command is initially scheduled.

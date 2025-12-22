@@ -11,6 +11,8 @@ import edu.wpi.first.math.MathUtil;
 //import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import org.littletonrobotics.junction.Logger;
+
 //import java.util.function.DoubleConsumer;
 
 import com.revrobotics.RelativeEncoder;
@@ -40,6 +42,9 @@ public class Drivetrain extends SubsystemBase {
   //right2 id 3
   final SparkMax rightMotor2 = new SparkMax(3, MotorType.kBrushless);
   final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
+
+  public double leftSpee;
+  public double rightSpee;
 
   public double getEncoderDistance() {
     return leftEncoder1.getPosition();
@@ -91,9 +96,12 @@ public class Drivetrain extends SubsystemBase {
 
     leftMotor1.setVoltage(leftSpeed);
     leftMotor2.setVoltage(leftSpeed);
-
+    leftSpee = leftSpeed;
     rightMotor1.setVoltage(rightSpeed);
     rightMotor2.setVoltage(rightSpeed);
+    rightSpee = rightSpeed;
+    Logger.recordOutput("TankDrive/DriveTrainSubsystem/Speed/Left", leftSpeed);
+    Logger.recordOutput("TankDrive/DriveTrainSubsystem/Speed/Right", rightSpeed);
   }
 
   
