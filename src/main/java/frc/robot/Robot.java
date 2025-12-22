@@ -106,8 +106,24 @@ Logger.start(); // Start logging! No more data receivers, replay sources, or met
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //if you hold right bumper, activate joystick control for the arm.
+    m_robotContainer.muscular.isJoyous = joystickyInstance.rightBumper().getAsBoolean();
     
+    //set the drivetrain target speeds
     moveWithJoystick.setSpeed(joystickyInstance.getLeftX(), joystickyInstance.getLeftY(), joystickyInstance.getRightX(), joystickyInstance.getRightY());
+    
+    //set the arm target velocity
+    moveWithJoystick.armature(joystickyInstance.getRightY(), m_robotContainer.muscular);
+    
+    //if you press left bumper, the current position becomes encoder 0
+    if (joystickyInstance.leftBumper().getAsBoolean()) {
+      m_robotContainer.muscular.resetEncoder();
+    }
+
+    //press y to activate setting a custom point (if joystick) or go to the custom point
+    if (joystickyInstance.y().getAsBoolean()) {
+      m_robotContainer.muscular.setCustomPoint();
+    }
   }
 
   @Override

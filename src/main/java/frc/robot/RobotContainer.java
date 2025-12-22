@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final Drivetrain m_Drivetrain = Drivetrain.getInstance();
-  public final ArmSubsystem m_arm = ArmSubsystem.getInstance();
+  public final ArmSubsystem muscular = ArmSubsystem.getInstance();
   public static final CommandXboxController m_driverController = new CommandXboxController(0);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   
@@ -46,9 +46,9 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driverController.a().onTrue(new ArmCommand(9.4, m_arm));
-    m_driverController.b().onTrue(new ArmCommand(1, m_arm));
-    m_driverController.x().onTrue(new ArmCommand(18, m_arm));
+    m_driverController.a().onTrue(new ArmCommand(9.4, muscular)); //vertical
+    m_driverController.b().onTrue(new ArmCommand(1, muscular));   //over robot
+    m_driverController.x().onTrue(new ArmCommand(18, muscular));  //away from robot
   }
 
   

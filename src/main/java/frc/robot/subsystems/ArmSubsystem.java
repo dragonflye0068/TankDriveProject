@@ -29,7 +29,10 @@ public class ArmSubsystem extends SubsystemBase {
     //private VoltageOut request = new VoltageOut(1);
     private MotionMagicVoltage request = new MotionMagicVoltage(0);//.withSlot(0);
     private double setpoint = 0;
-    
+    public boolean isJoyous; //when it is controlled by joystick
+    private double speed; //a value fed directly to the motor
+    private double customPoint; //a user-defined custom point for travelling
+
     public static void setConfig() {
     TalonFXConfiguration armConfig = new TalonFXConfiguration();
     Slot0Configs slot0 = armConfig.Slot0;
@@ -41,12 +44,12 @@ public class ArmSubsystem extends SubsystemBase {
     armConfig.CurrentLimits.SupplyCurrentLowerLimit = 10;
     armConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     armConfig.MotionMagic.MotionMagicCruiseVelocity = 10;
-    armConfig.MotionMagic.MotionMagicAcceleration = 4;
+    armConfig.MotionMagic.MotionMagicAcceleration = 30;
     armConfig.MotionMagic.MotionMagicJerk = 1000;
     slot0.GravityType = GravityTypeValue.Arm_Cosine;
     slot0.kS = 0.3;
     slot0.kV = 1.5;
-    slot0.kA = 0.3;
+    slot0.kA = 0;
     slot0.kP = 15;
     slot0.kI = 0.0;
     slot0.kD = 0.0;
@@ -61,16 +64,46 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor.setVoltage(0);
     setConfig();
   }
+  public void resetEncoder() {
+    armMotor.setPosition(0);
+    customPoint = 0.5; // random
+  }
   public void setTarget(double targetPos) {
+    //setting the target for magicMotion to travel to
     setpoint = targetPos;
   }
-  
+
+  public void setVoltage(double volts) {
+    // specifically for controlling the arm via joystick
+    Logger.recordOutput("TankDrive/ArmSubsystem/Input/Volts", volts);
+    if ((currentPos < 1 && volts < 0) || (currentPos > 18 && volts > 0)) {
+      if (Math.abs(volts) < 0.2) {
+        speed = volts*2;
+        Logger.recordOutput("TankDrive/ArmSubsystem/Input/Odd", 1);
+      } else {
+        speed = 0;
+      }
+    } else {
+      speed = volts;
+      Logger.recordOutput("TankDrive/ArmSubsystem/Input/Odd", -1);
+    }
+    Logger.recordOutput("TankDrive/ArmSubsystem/Input/Speed", speed);
+  }
 
   public double getEncoderDistance() {
     return armMotor.getPosition().getValueAsDouble();
   }
   
-  
+  public void setCustomPoint() {
+    //for setting the custom point
+    if (isJoyous) {
+      //when controlled by joystick, press Y to save a position
+      customPoint = getEncoderDistance();
+    } else {
+      //when not controlled by joystick, press Y to travel to saved position.
+      setpoint = customPoint;
+    }
+  }
 
   public static ArmSubsystem getInstance() {
     if (instance == null) instance = new ArmSubsystem();
@@ -82,9 +115,13 @@ public class ArmSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     //armMotor.setVoltage(1); works
     currentPos = getEncoderDistance();
-    armMotor.setControl(request.withPosition(setpoint));
-    //Logger.recordOutput("TankDrive/ArmSubsystem/Calculation/Pos", request.withPosition(setpoint).getPositionMeasure());
-    //Logger.recordOutput("TankDrive/ArmSubsystem/SetPoint", setpoint);
+    if (isJoyous) {
+      //when controlled by joystick, use raw voltage value
+      armMotor.setControl(new VoltageOut(speed));
+    } else {
+      //only travel to the set point when not in joystick mode
+      armMotor.setControl(request.withPosition(setpoint));
+    }
     Logger.recordOutput("TankDrive/ArmSubsystem/Voltage", armMotor.getMotorVoltage().getValueAsDouble());
   }
   

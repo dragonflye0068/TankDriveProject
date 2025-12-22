@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Drivetrain;
 
 import org.littletonrobotics.junction.Logger;
@@ -20,7 +21,7 @@ public class JoyStickCommand extends Command {
   private final Drivetrain m_subsystem;
   double grandfathersLeftVoltage = 0;
   double grandfathersRightVoltage = 0;
-  private final PIDController speedsterPID = new PIDController(.2,0,0);
+  private final PIDController speedsterPID = new PIDController(.5,0,0);
   private final LoggedNetworkNumber myConstant = new LoggedNetworkNumber("A constant", 0.0);
   private double targetL;
   private double targetR;
@@ -50,11 +51,14 @@ public class JoyStickCommand extends Command {
     }
     Logger.recordOutput("TankDrive/JoyStickCommand/Speed/TargLeft", targetL);
     Logger.recordOutput("TankDrive/JoyStickCommand/Speed/TargRight", targetR);
-    double newL = MathUtil.clamp(grandfathersLeftVoltage + speedsterPID.calculate(targetL), -0.7, 0.7);
-    double newR = MathUtil.clamp(grandfathersRightVoltage + speedsterPID.calculate(targetR), -0.7, 0.7);
+    double newL = MathUtil.clamp(speedsterPID.calculate(targetL)*-2, -0.7, 0.7);
+    double newR = MathUtil.clamp(speedsterPID.calculate(targetR)*-2, -0.7, 0.7);
     m_subsystem.runMotor(newL, newR);
     grandfathersLeftVoltage = m_subsystem.leftSpee;
     grandfathersRightVoltage = m_subsystem.rightSpee;
+  }
+  public void armature(double rY, ArmSubsystem muscle) {
+    muscle.setVoltage(rY);
   }
 
   // Called when the command is initially scheduled.
