@@ -53,7 +53,7 @@ public class ArmSubsystem extends SubsystemBase {
     slot0.kP = 15;
     slot0.kI = 0.0;
     slot0.kD = 0.0;
-    slot0.kG = 0.1;
+    slot0.kG = 0.2;
 
     armConfig.Slot0 = slot0;
     armMotor.getConfigurator().apply(armConfig);

@@ -46,9 +46,9 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driverController.a().onTrue(new ArmCommand(9.4, muscular)); //vertical
-    m_driverController.b().onTrue(new ArmCommand(1, muscular));   //over robot
-    m_driverController.x().onTrue(new ArmCommand(18, muscular));  //away from robot
+    m_driverController.a().onTrue(new ArmCommand(9.75, muscular)); //vertical
+    m_driverController.b().onTrue(new ArmCommand(1, muscular));    //over robot
+    m_driverController.x().onTrue(new ArmCommand(18.8, muscular)); //away from robot
   }
 
   
