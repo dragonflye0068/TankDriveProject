@@ -5,7 +5,9 @@
 package frc.robot;
 
 import frc.robot.commands.AutoCommand;
+import frc.robot.commands.TeleopArm;
 import frc.robot.commands.TeleopCommand;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -28,6 +30,7 @@ public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final AutoCommand m_autoCommand = new AutoCommand(m_Drivetrain, 3);
+  private final Arm m_arm = Arm.getInstance();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -44,6 +47,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // m_Drivetrain.setDefaultCommand(new TeleopCommand(m_Drivetrain, m_driverController));
+    m_driverController.x().onTrue(new TeleopArm(m_arm, 17.36));
+    m_driverController.y().onTrue(new TeleopArm(m_arm, 9.75));
+    m_driverController.b().onTrue(new TeleopArm(m_arm, 2.41));
     m_Drivetrain.setDefaultCommand(new TeleopCommand(m_Drivetrain, m_driverController));
   }
 

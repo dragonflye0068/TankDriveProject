@@ -53,7 +53,7 @@ public class Drivetrain extends SubsystemBase {
 
   private final PIDController m_accelratiPidController = new PIDController(0.2, 0, 0);
 
-  public final double maxspeed = 0.5;
+  public final double maxspeed = 0.3;
 
   public double getEncoderDistance() {
 
@@ -92,7 +92,7 @@ public class Drivetrain extends SubsystemBase {
 
     oldVoltageLeft = leftMotor1.get()*12;
     oldVoltageRight = rightMotor1.get()*12;
-    System.out.println(oldVoltageLeft);
+    // System.out.println(oldVoltageLeft);
 
     double difference = oldVoltageLeft - leftSpeed;
     
