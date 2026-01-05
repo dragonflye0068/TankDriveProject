@@ -29,7 +29,7 @@ public class ArmSubsystem extends SubsystemBase {
     //private VoltageOut request = new VoltageOut(1);
     private MotionMagicVoltage request = new MotionMagicVoltage(0);//.withSlot(0);
     private double setpoint = 0;
-    public boolean isJoyous; //when it is controlled by joystick
+    public boolean isJoyous; // true when it is controlled by joystick (pressing right bumper) and set by robot.java
     private double speed; //a value fed directly to the motor
     private double customPoint; //a user-defined custom point for travelling
 
